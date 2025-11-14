@@ -1,0 +1,20 @@
+{
+  "connector.class": "io.aiven.connect.elasticsearch.ElasticsearchSinkConnector",
+  "tasks.max": "1",
+  "connection.url": "http://elasticsearch:9200",
+  "topics": "dbserver1.ProductsDB.dbo.Products",
+  "type.name": "_doc",
+  "key.ignore": "false",
+  "schema.ignore": "true",
+  "behavior.on.null.values": "delete",
+  "index.name.format": "products",
+
+  "transforms": "extractAfter,extractKey,routeTopic",
+  "transforms.extractAfter.type": "org.apache.kafka.connect.transforms.ExtractField$Value",
+  "transforms.extractAfter.field": "after",
+  "transforms.extractKey.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+  "transforms.extractKey.field": "Id",
+  "transforms.routeTopic.type": "org.apache.kafka.connect.transforms.RegexRouter",
+  "transforms.routeTopic.regex": ".*",
+  "transforms.routeTopic.replacement": "products"
+}

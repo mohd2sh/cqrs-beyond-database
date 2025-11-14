@@ -1,0 +1,23 @@
+{
+  "connector.class": "io.debezium.connector.sqlserver.SqlServerConnector",
+  "tasks.max": "1",
+
+  "topic.prefix": "dbserver1",
+
+  "database.hostname": "sqlserver",
+  "database.port": "1433",
+  "database.user": "sa",
+  "database.password": "YourStrong@Passw0rd",
+  "database.encrypt": "false",
+
+  "database.names": "ProductsDB",
+  "table.include.list": "dbo.Products",
+
+  "schema.history.internal.kafka.bootstrap.servers": "kafka:9092",
+  "schema.history.internal.kafka.topic": "schema-changes.products",
+
+  "snapshot.mode": "initial",
+  "incremental.snapshot.enabled": "true",
+  "include.schema.changes": "false"
+}
+

@@ -1,0 +1,22 @@
+FROM confluentinc/cp-kafka-connect:7.5.0
+
+USER root
+
+# Install unzip and curl on UBI-based image
+RUN microdnf install -y unzip curl && microdnf clean all
+
+# Download and install Debezium SQL Server connector (v2.4.2.Final) from Maven Central
+ENV DEBEZIUM_VERSION=2.4.2.Final
+RUN set -euo pipefail; \
+  DBZ_ZIP="/tmp/debezium-connector-sqlserver-${DEBEZIUM_VERSION}-plugin.zip"; \
+  curl -fSL -o "$DBZ_ZIP" "https://repo1.maven.org/maven2/io/debezium/debezium-connector-sqlserver/${DEBEZIUM_VERSION}/debezium-connector-sqlserver-${DEBEZIUM_VERSION}-plugin.zip"; \
+  unzip -q "$DBZ_ZIP" -d /usr/share/java/; \
+  rm -f "$DBZ_ZIP"
+
+# Install Elasticsearch sink connector via Confluent Hub
+# NOTE: Elasticsearch sink connector will be provided via mounted volume at runtime
+
+# Ensure plugin path includes default directories
+ENV CONNECT_PLUGIN_PATH=/usr/share/java,/usr/share/confluent-hub-components,/usr/share/java/external-plugins
+
+USER root
