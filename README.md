@@ -4,16 +4,17 @@ Demo of implementing Command Query Responsibility Segregation (CQRS) at the infr
 
 ## Design Philosophy
 
-Traditional CQRS implementations often rely on application-level event publishing, requiring developers to explicitly emit events for every state change. This approach introduces coupling between business logic and infrastructure concerns, making it difficult to maintain consistency and scale independently.
+This demonstration implements CQRS (Command Query Responsibility Segregation) at the infrastructure level using Change Data Capture (CDC) and event streaming. The architecture achieves read/write separation by automatically capturing database changes through CDC, streaming them via Kafka, and maintaining eventual consistency between the write database (SQL Server) and read database (Elasticsearch).
 
-This demonstration explores an alternative approach: leveraging database-level Change Data Capture (CDC) to automatically capture all data changes without requiring application code modifications. By moving CQRS separation to the infrastructure layer, we achieve:
+**Core Concepts:**
 
-- **Decoupled Architecture**: Business logic remains focused on domain concerns without infrastructure coupling
-- **Automatic Consistency**: All database changes are captured automatically, eliminating the risk of missed events
-- **Independent Scaling**: Read and write databases can be scaled and optimized independently
-- **Technology Flexibility**: The CDC pipeline is database-agnostic and can work with any application framework
+- **CQRS**: Commands write to SQL Server, queries read from Elasticsearch - complete separation of read and write models
+- **Change Data Capture (CDC)**: Database-level change capture eliminates the need for application-level event publishing
+- **Event Streaming**: Changes flow through Kafka as a durable, scalable event stream
+- **Eventual Consistency**: Acceptable delay between write and read operations enables independent optimization and scaling
+- **Infrastructure-Level Separation**: CQRS boundaries exist at the database layer, not in application code
 
-This architectural pattern is detailed in the design blog post: [Moving CQRS Beyond the Database: System Design with Debezium, Kafka, and Elasticsearch](https://blog.mshakhtour.com/2025/11/02/moving-cqrs-beyond-the-database-system-design-with-debezium-kafka-and-elasticsearch/)
+This architectural pattern is detailed in the design blog post: [Moving CQRS Beyond the Database: System Design with Debezium, Kafka, and Elasticsearch](https://medium.com/@mohd2sh/moving-cqrs-beyond-the-database-system-design-with-debezium-kafka-and-elasticsearch-2e2b425a5fcb)
 
 ## Design Overview
 
@@ -193,7 +194,7 @@ The following scenario demonstrates the CDC pipeline in action, showing how data
 
 **Step 3: Verify Product Appears (After CDC Sync)**
 ![Verify New Product](docs/Scenario-3-GetAllProductsAndVerify.png)
-*After 2-5 seconds, the new product appears in Elasticsearch via the CDC pipeline*
+*After small delay, the new product appears in Elasticsearch via the CDC pipeline*
 
 This demonstrates **eventual consistency**: the write operation completes immediately in SQL Server, but the read operation reflects the change after the CDC pipeline (Debezium → Kafka → Elasticsearch Sink Connector) processes the event.
 
