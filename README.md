@@ -126,17 +126,20 @@ The CDC pipeline and event streaming layer remain unchanged regardless of the so
 
 ## Related Projects
 
-This demonstration focuses on the infrastructure-level CQRS pattern. For a comprehensive .NET application architecture implementing CQRS with Domain-Driven Design (DDD) and Clean Architecture principles, see:
+This project uses NuGet packages from the [CleanArchitecture-DDD-CQRS](https://github.com/mohd2sh/CleanArchitecture-DDD-CQRS) repository for CQRS abstractions, DDD patterns, and repository interfaces:
+- `Mohd2sh.CleanArchitecture.Core.Application`
+- `Mohd2sh.CleanArchitecture.Core.Domain`
+- `Mohd2sh.CleanArchitecture.Core.Infrastructure`
 
-**[CleanArchitecture-DDD-CQRS](https://github.com/mohd2sh/CleanArchitecture-DDD-CQRS)**: A production-ready template featuring:
+The infrastructure-level CDC design demonstrated here can be applied to the CleanArchitecture-DDD-CQRS template. That template provides:
 - Domain-Driven Design patterns and bounded contexts
 - Clean Architecture boundaries with automated architecture tests
-- Comprehensive error management system
+- Error management system
 - Integration event patterns
 - Outbox pattern for guaranteed event delivery
 - Cross-aggregate coordination through domain events
 
-The CleanArchitecture template demonstrates how to structure application code to work with infrastructure-level CQRS patterns like the one demonstrated here.
+Combining the CleanArchitecture-DDD-CQRS application structure with this infrastructure-level CDC approach provides a complete solution: application-level CQRS with DDD patterns, plus infrastructure-level read/write separation through CDC streaming.
 
 ## Getting Started
 
