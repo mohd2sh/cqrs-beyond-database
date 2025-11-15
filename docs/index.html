@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-site-verification" content="A6tHTS5FsuxXuWy3LSg5yzVrA7j2R3S2R9he25A0aWs" />
+  <title>CQRS Beyond the Database</title>
+  <link rel="stylesheet" href="https://pages-themes.github.io/minimal/assets/css/style.css">
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <h1><a href="/">CQRS Beyond the Database</a></h1>
+      <p>Infrastructure-Level Architecture with CDC and Event Streaming</p>
+    </header>
+    <section>
+    <p><strong>Achieve true read/write separation using Change Data Capture (CDC), Debezium, Kafka, and Elasticsearch. A .NET demonstration of infrastructure-level CQRS that enables independent scaling without application-level event publishing.</strong></p>
+
+    <hr>
+
+    <h2>What is This?</h2>
+
+    <p>This repository demonstrates how to implement <strong>Command Query Responsibility Segregation (CQRS)</strong> at the infrastructure level using <strong>Change Data Capture (CDC)</strong> and <strong>event streaming</strong>. Unlike traditional CQRS implementations that only separate commands and queries in code, this approach achieves physical separation at the database layer.</p>
+
+    <p><strong>Core Technologies:</strong></p>
+    <ul>
+      <li><strong>.NET 8</strong> - Application framework with CQRS patterns</li>
+      <li><strong>SQL Server</strong> - Write database with CDC enabled</li>
+      <li><strong>Debezium</strong> - CDC connector framework</li>
+      <li><strong>Apache Kafka</strong> - Event streaming platform</li>
+      <li><strong>Elasticsearch</strong> - Read-optimized database</li>
+    </ul>
+
+    <h2>Architecture Overview</h2>
+
+    <p><img src="HighLevelDesign.png" alt="High-Level Design"></p>
+
+    <p>The architecture achieves read/write separation through an automated pipeline:</p>
+
+    <ol>
+      <li><strong>Commands</strong> write to SQL Server (transactional database)</li>
+      <li><strong>CDC</strong> captures all database changes automatically</li>
+      <li><strong>Debezium</strong> reads CDC logs and publishes to Kafka</li>
+      <li><strong>Kafka</strong> streams change events reliably</li>
+      <li><strong>Elasticsearch Sink Connector</strong> indexes data in Elasticsearch</li>
+      <li><strong>Queries</strong> read from Elasticsearch (optimized for search)</li>
+    </ol>
+
+    <p>This demonstrates <strong>eventual consistency</strong>: changes written to SQL Server appear in Elasticsearch within small delay through the CDC pipeline, without requiring application code modifications.</p>
+
+    <h2>Key Concepts</h2>
+
+    <h3>CQRS (Command Query Responsibility Segregation)</h3>
+    <p>Complete separation of read and write models. Commands write to SQL Server, queries read from Elasticsearch - each optimized for its purpose.</p>
+
+    <h3>Change Data Capture (CDC)</h3>
+    <p>Database-level change capture eliminates the need for application-level event publishing. All database modifications are captured automatically, including direct SQL operations.</p>
+
+    <h3>Event Streaming</h3>
+    <p>Changes flow through Kafka as a durable, scalable event stream, enabling reliable data replication and downstream processing.</p>
+
+    <h3>Eventual Consistency</h3>
+    <p>Acceptable delay between write and read operations enables independent optimization and scaling.</p>
+
+    <h2>Why This Matters</h2>
+
+    <p><strong>Traditional CQRS Limitations:</strong></p>
+    <ul>
+      <li>Commands and queries point to the same database</li>
+      <li>Read and write operations compete for resources</li>
+      <li>No scalability or performance benefits</li>
+      <li>Pattern exists only in code, not infrastructure</li>
+    </ul>
+
+    <p><strong>Infrastructure-Level CQRS Benefits:</strong></p>
+    <ul>
+      <li><strong>True Separation</strong>: Read and write databases are physically independent</li>
+      <li><strong>Independent Scaling</strong>: Each side scales based on its workload</li>
+      <li><strong>Performance Optimization</strong>: SQL Server for transactions, Elasticsearch for queries</li>
+      <li><strong>Zero Application Impact</strong>: No code changes required for event capture</li>
+      <li><strong>Complete Coverage</strong>: All database changes captured automatically</li>
+    </ul>
+
+    <h2>Quick Start</h2>
+
+    <p>Get the complete stack running in minutes:</p>
+
+    <pre><code># 1. Start all infrastructure services
+docker-compose up -d
+
+# 2. Run the .NET API
+cd src/CdcCqrsDemo.Api
+dotnet run
+</code></pre>
+
+    <p><strong>Access Points:</strong></p>
+    <ul>
+      <li><strong>API Swagger</strong>: <a href="https://localhost:7000/swagger">https://localhost:7000/swagger</a></li>
+      <li><strong>Debezium UI</strong>: <a href="http://localhost:8080">http://localhost:8080</a></li>
+      <li><strong>Kibana</strong>: <a href="http://localhost:5601">http://localhost:5601</a></li>
+    </ul>
+
+    <p>See the <a href="../README.md">full README</a> for detailed setup instructions and architecture documentation.</p>
+
+    <h2>See It In Action</h2>
+
+    <p>The repository includes screenshots demonstrating the CDC pipeline:</p>
+
+    <p><strong>Step 1: Initial State</strong><br>
+    <img src="Scenario-1-GetAllProducts.png" alt="Initial Products"></p>
+
+    <p><strong>Step 2: Create Product</strong><br>
+    <img src="Scenario-2-CreateNewProduct.png" alt="Create Product"></p>
+
+    <p><strong>Step 3: Verify CDC Sync</strong><br>
+    <img src="Scenario-3-GetAllProductsAndVerify.png" alt="Verify New Product"></p>
+
+    <p>This demonstrates eventual consistency: the product is written to SQL Server immediately, then appears in Elasticsearch after the CDC pipeline processes the change.</p>
+
+    <h2>Technology Stack</h2>
+
+    <ul>
+      <li><strong>Application</strong>: .NET 8 with CQRS pattern implementation</li>
+      <li><strong>Write Database</strong>: SQL Server 2019 with CDC enabled</li>
+      <li><strong>CDC Framework</strong>: Debezium SQL Server connector</li>
+      <li><strong>Event Streaming</strong>: Apache Kafka</li>
+      <li><strong>Read Database</strong>: Elasticsearch 8.10</li>
+      <li><strong>Orchestration</strong>: Docker Compose (demo only)</li>
+    </ul>
+
+    <p><strong>Note</strong>: While this demonstration uses SQL Server, the architecture supports any database with CDC capabilities (PostgreSQL, MySQL, MongoDB, Oracle).</p>
+
+    <h2>Production Considerations</h2>
+
+    <p>This repository uses Docker Compose for demonstration purposes only. Production deployments require:</p>
+
+    <ul>
+      <li><strong>Infrastructure as Code</strong>: Terraform, Pulumi, or CloudFormation</li>
+      <li><strong>Container Orchestration</strong>: Kubernetes or managed services</li>
+      <li><strong>Secrets Management</strong>: Proper credential handling</li>
+      <li><strong>Monitoring</strong>: Comprehensive logging, metrics, and tracing</li>
+      <li><strong>High Availability</strong>: Multi-region deployments and disaster recovery</li>
+    </ul>
+
+    <p>See the <a href="../README.md">README</a> for detailed production considerations.</p>
+
+    <h2>Related Resources</h2>
+
+    <p><strong>Blog Post</strong>: <a href="https://medium.com/@mohd2sh/moving-cqrs-beyond-the-database-system-design-with-debezium-kafka-and-elasticsearch-2e2b425a5fcb">Moving CQRS Beyond the Database: System Design with Debezium, Kafka, and Elasticsearch</a></p>
+
+    <p><strong>Application Architecture Template</strong>: <a href="https://github.com/mohd2sh/CleanArchitecture-DDD-CQRS">CleanArchitecture-DDD-CQRS</a> - This project uses NuGet packages from this repository for CQRS abstractions, DDD patterns, and repository interfaces.</p>
+
+    <h2>Repository</h2>
+
+    <p><strong>GitHub</strong>: <a href="https://github.com/mohd2sh/cqrs-beyond-database">View Repository</a></p>
+
+    <p>The repository includes:</p>
+    <ul>
+      <li>Complete .NET 8 implementation</li>
+      <li>Docker Compose infrastructure setup</li>
+      <li>Database initialization scripts</li>
+      <li>Connector configurations</li>
+      <li>Comprehensive documentation</li>
+      <li>Working examples and screenshots</li>
+    </ul>
+
+    <h2>When to Use This Approach</h2>
+
+    <p>This architecture is appropriate when:</p>
+
+    <ul>
+      <li>System faces high read volumes or complex queries</li>
+      <li>Need for full-text search, analytics, or flexible filtering</li>
+      <li>Team is invested in Kafka or event-driven integration</li>
+      <li>Eventual consistency is acceptable for performance gains</li>
+      <li>Independent scaling of read and write workloads is required</li>
+    </ul>
+
+    <p>For smaller systems with straightforward queries, the additional infrastructure may not justify the complexity. But for large, data-intensive applications, this approach transforms CQRS from a code pattern into a real architectural boundary.</p>
+
+    <hr>
+
+    <p><strong>CQRS was never meant to be a naming convention—it was meant to decouple read and write concerns in both design and infrastructure.</strong></p>
+
+    <p>Using Debezium and Kafka to replicate data changes from a transactional database into Elasticsearch provides that separation in a practical, maintainable way for .NET systems.</p>
+
+    <hr>
+
+    <p><em>This is a demonstration project for educational and design exploration purposes.</em></p>
+    </section>
+  </div>
+</body>
+</html>
+
